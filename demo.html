@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARBON — Product Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,300;0,400;0,600;1,300&family=Inter:ital,wght@0,200;0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #1d1d1d;
+  --green: #62d65c;
+  --white: #ffffff;
+  --glass: rgba(255,255,255,0.07);
+  --glass-border: rgba(255,255,255,0.1);
+  --green-glass: rgba(98,214,92,0.07);
+  --green-border: rgba(98,214,92,0.22);
+  --pad: 120px 80px;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 56px;
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  background: rgba(29,29,29,0.78);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.nav-logo {
+  font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 400; letter-spacing: 2px;
+  color: var(--white); display: flex; align-items: center; gap: 10px; text-decoration: none;
+}
+.nav-dot { width: 9px; height: 9px; border-radius: 3px; background: var(--green); animation: pulse 2.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a { font-family: 'Source Code Pro', monospace; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.42); text-decoration: none; letter-spacing: 0.5px; transition: color .2s; }
+.nav-links a:hover { color: var(--green); }
+.nav-cta { font-family: 'Source Code Pro', monospace; font-size: 12px; font-weight: 400; color: var(--bg); background: var(--green); border: none; padding: 9px 22px; border-radius: 6px; cursor: pointer; letter-spacing: 0.5px; text-decoration: none; transition: opacity .2s, transform .15s; }
+.nav-cta:hover { opacity: .85; transform: translateY(-1px); }
+
+.demo-hero { padding: 132px 80px 72px; max-width: 1180px; margin: 0 auto; }
+.demo-eyebrow { font-family: 'Source Code Pro', monospace; font-size: 12px; font-weight: 300; color: var(--green); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 18px; }
+.demo-title { font-family: 'Inter', sans-serif; font-size: clamp(32px,4.5vw,56px); font-weight: 400; color: var(--white); letter-spacing: -1.8px; line-height: 1.08; max-width: 760px; margin-bottom: 16px; }
+.demo-lead { font-family: 'Source Code Pro', monospace; font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.52); line-height: 1.75; max-width: 640px; margin-bottom: 36px; }
+
+.video-shell {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  border-radius: 22px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.45);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.video-shell iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+.rule { width: calc(100% - 160px); margin: 0 80px; height: 1px; background: rgba(255,255,255,0.07); }
+
+.s-label { font-family: 'Source Code Pro', monospace; font-size: 11px; font-weight: 300; color: var(--green); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
+.s-label::after { content: ''; flex: 1; max-width: 56px; height: 1px; background: var(--green); opacity: .4; }
+.s-head { font-family: 'Inter', sans-serif; font-size: clamp(28px,3.6vw,50px); font-weight: 400; color: var(--white); letter-spacing: -1.5px; line-height: 1.12; max-width: 820px; }
+.s-body { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.52); line-height: 1.78; max-width: 720px; margin-top: 18px; }
+
+.deepdive { padding: var(--pad); }
+.deepdive-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-top: 56px; }
+.band-green { background: rgba(98,214,92,0.03); border-top: 1px solid rgba(98,214,92,0.08); border-bottom: 1px solid rgba(98,214,92,0.08); }
+
+.feat-list { display: flex; flex-direction: column; gap: 14px; margin-top: 32px; }
+.feat { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 12px; backdrop-filter: blur(12px); transition: background .2s, border-color .2s; }
+.feat:hover { background: var(--green-glass); border-color: var(--green-border); }
+.feat-ic { width: 32px; height: 32px; border-radius: 8px; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+.feat h4 { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+.feat p { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.42); line-height: 1.6; }
+
+.chain-visual { display: flex; flex-direction: column; gap: 14px; }
+.chain-block { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; padding: 20px 22px; backdrop-filter: blur(16px); position: relative; overflow: hidden; }
+.chain-block::after { content:''; position:absolute; inset:0; background: linear-gradient(135deg,rgba(98,214,92,0.05) 0%,transparent 60%); pointer-events:none; }
+.c-lbl { font-family: 'Source Code Pro', monospace; font-size: 10px; font-weight: 300; color: var(--green); letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 12px; }
+.c-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.c-node { font-family: 'Source Code Pro', monospace; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; white-space: nowrap; }
+.c-node.g { background: rgba(98,214,92,0.12); border-color: rgba(98,214,92,0.28); color: var(--green); }
+.c-arr { color: rgba(255,255,255,0.2); font-size: 15px; }
+.c-note { font-family: 'Source Code Pro', monospace; font-size: 11px; font-weight: 300; color: rgba(255,255,255,0.22); margin-top: 10px; letter-spacing: .5px; }
+
+.steps-row { display: grid; grid-template-columns: repeat(4,1fr); margin-top: 48px; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden; }
+.step { padding: 38px 28px; background: var(--glass); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.06); transition: background .2s; }
+.step:last-child { border-right: none; }
+.step:hover { background: rgba(255,255,255,0.1); }
+.step-n { font-family: 'Inter', sans-serif; font-size: 42px; font-weight: 400; color: rgba(255,255,255,0.07); line-height: 1; margin-bottom: 14px; }
+.step-tag { display: inline-block; font-family: 'Source Code Pro', monospace; font-size: 10px; color: var(--green); background: rgba(98,214,92,0.1); border: 1px solid rgba(98,214,92,0.2); padding: 3px 9px; border-radius: 4px; margin-bottom: 14px; letter-spacing: 1px; }
+.step h3 { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+.step p { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.4); line-height: 1.7; }
+
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cmp-col { display: flex; flex-direction: column; gap: 6px; }
+.cmp-head { font-family: 'Source Code Pro', monospace; font-size: 10px; letter-spacing: 2px; margin-bottom: 8px; }
+.cmp-row { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.55); }
+.cmp-row.bad { color: rgba(255,255,255,0.28); }
+
+.stat-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 48px; }
+.stat-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 28px 24px; backdrop-filter: blur(20px); }
+.s-lbl { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.36); margin-bottom: 10px; }
+.s-val { font-family: 'Inter', sans-serif; font-size: clamp(30px,3vw,44px); font-weight: 700; color: var(--white); letter-spacing: -2px; line-height: 1; margin-bottom: 4px; }
+.s-val.g { color: var(--green); }
+.s-sub { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.36); }
+
+.demo-cta { padding: 96px 80px 120px; text-align: center; }
+.btn-p { font-family: 'Source Code Pro', monospace; font-size: 14px; font-weight: 400; color: var(--bg); background: var(--green); border: none; padding: 13px 30px; border-radius: 8px; cursor: pointer; letter-spacing: .5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: opacity .2s, transform .15s; }
+.btn-p:hover { opacity: .88; transform: translateY(-2px); }
+.btn-g { font-family: 'Source Code Pro', monospace; font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.6); background: var(--glass); border: 1px solid var(--glass-border); padding: 13px 30px; border-radius: 8px; cursor: pointer; letter-spacing: .5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; backdrop-filter: blur(12px); transition: background .2s, color .2s, transform .15s; }
+.btn-g:hover { background: rgba(255,255,255,0.13); color: var(--white); transform: translateY(-2px); }
+.cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+
+footer { padding: 42px 80px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; }
+.foot-logo { font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 400; color: rgba(255,255,255,0.28); letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
+.foot-links { display: flex; gap: 24px; list-style: none; }
+.foot-links a { font-family: 'Source Code Pro', monospace; font-size: 11px; font-weight: 300; color: rgba(255,255,255,0.22); text-decoration: none; transition: color .2s; }
+.foot-links a:hover { color: rgba(255,255,255,0.6); }
+.foot-copy { font-family: 'Source Code Pro', monospace; font-size: 10px; font-weight: 300; color: rgba(255,255,255,0.16); }
+
+@media (max-width: 960px) {
+  :root { --pad: 72px 24px; }
+  nav { padding: 16px 24px; }
+  .nav-links { display: none; }
+  .demo-hero { padding: 110px 24px 48px; }
+  .deepdive { padding: var(--pad); }
+  .deepdive-grid { grid-template-columns: 1fr; gap: 36px; }
+  .steps-row { grid-template-columns: 1fr 1fr; }
+  .stat-strip { grid-template-columns: 1fr 1fr; }
+  .rule { width: calc(100% - 48px); margin: 0 24px; }
+  footer { padding: 32px 24px; flex-direction: column; text-align: center; }
+  .demo-cta { padding: 72px 24px 96px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="carbon-landing.html" class="nav-logo"><span class="nav-dot"></span>CARBON</a>
+  <ul class="nav-links">
+    <li><a href="#deepdive">Deep Dive</a></li>
+    <li><a href="#capabilities">Capabilities</a></li>
+    <li><a href="#workflow">Workflow</a></li>
+    <li><a href="carbon-landing.html#solution">Full Story</a></li>
+  </ul>
+  <a href="carbon-landing.html" class="nav-cta">Back to Site →</a>
+</nav>
+
+<section class="demo-hero">
+  <p class="demo-eyebrow">// Product Demo</p>
+  <h1 class="demo-title">See CARBON in action.</h1>
+  <p class="demo-lead">Watch the walkthrough, then explore how the exchange replaces fragmented EU ETS infrastructure with one on-chain registry, direct settlement, and live market visibility.</p>
+  <div class="video-shell">
+    <iframe src="https://www.youtube.com/embed/-uXiNh0QJ5c" title="CARBON product demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<section id="deepdive" class="deepdive band-green">
+  <p class="s-label">// Product Deep Dive</p>
+  <h2 class="s-head">A single exchange layer for the EU carbon market.</h2>
+  <p class="s-body">CARBON tokenizes EU allowances, routes company-to-company trades through one public ledger, and retires credits on-chain at compliance deadlines. The demo above shows the product flow; the sections below unpack the architecture, guarantees, and operating model behind it.</p>
+
+  <div class="stat-strip">
+    <div class="stat-card"><div class="s-lbl">Annual trading volume</div><div class="s-val">€881B</div><div class="s-sub">EU carbon market</div></div>
+    <div class="stat-card"><div class="s-lbl">Reporting lag removed</div><div class="s-val g">0ms</div><div class="s-sub">on-chain settlement</div></div>
+    <div class="stat-card"><div class="s-lbl">EU ETS-covered emissions</div><div class="s-val g">50%</div><div class="s-sub">below 2005 levels</div></div>
+    <div class="stat-card"><div class="s-lbl">Daily spot trading</div><div class="s-val">€3B</div><div class="s-sub">per day</div></div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<section id="capabilities" class="deepdive">
+  <div class="deepdive-grid">
+    <div>
+      <p class="s-label">// Core Capabilities</p>
+      <h2 class="s-head">Built for compliance, settlement, and transparency.</h2>
+      <p class="s-body">Each module in CARBON maps to a failure mode in today’s EU ETS stack: fragmented registries, bilateral opacity, and delayed verification.</p>
+      <div class="feat-list">
+        <div class="feat"><div class="feat-ic">⛓</div><div><h4>On-Chain Credit Registry</h4><p>Every EUA is tokenized once. Ownership, transfer history, and retirement state live in one immutable registry instead of 27 siloed national systems.</p></div></div>
+        <div class="feat"><div class="feat-ic">⚡</div><div><h4>Direct Company-to-Company Trading</h4><p>Surplus sellers and deficit buyers settle atomically on-chain. No broker layer, no duplicated records, no reconciliation lag between counterparties.</p></div></div>
+        <div class="feat"><div class="feat-ic">🔍</div><div><h4>Full Market Transparency</h4><p>Trade flow, pricing, and inventory movement are publicly readable in real time — giving regulators and markets the visibility the compliance cycle currently hides for months.</p></div></div>
+        <div class="feat"><div class="feat-ic">✅</div><div><h4>EU ETS Compliant by Design</h4><p>Protocol rules mirror allowance issuance, transfer constraints, and retirement obligations so compliance is enforced by the exchange itself.</p></div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Source Code Pro',monospace;font-size:10px;color:rgba(255,255,255,0.22);letter-spacing:2px;margin-bottom:18px;">// HOW IT CHANGES</div>
+      <div class="chain-visual">
+        <div class="chain-block">
+          <div class="c-lbl">// Trade Flow</div>
+          <div class="c-row"><span class="c-node">Company A</span><span class="c-arr">→</span><span class="c-node g">CARBON Exchange</span><span class="c-arr">→</span><span class="c-node">Company B</span></div>
+          <div class="c-note">On-chain · Instant · Auditable · No intermediary</div>
+        </div>
+        <div class="chain-block">
+          <div class="c-lbl">// Credit Lifecycle</div>
+          <div class="c-row"><span class="c-node g">Mint</span><span class="c-arr">→</span><span class="c-node">Trade</span><span class="c-arr">→</span><span class="c-node">Verify</span><span class="c-arr">→</span><span class="c-node g">Retire</span></div>
+          <div class="c-note">Every step on-chain. Zero double-counting. Forever auditable.</div>
+        </div>
+        <div class="chain-block">
+          <div class="c-lbl">// Before vs After</div>
+          <div class="compare-grid">
+            <div class="cmp-col"><div class="cmp-head" style="color:rgba(255,255,255,0.2);">BEFORE</div><div class="cmp-row bad">✗ 27 siloed registries</div><div class="cmp-row bad">✗ 9–18mo lag</div><div class="cmp-row bad">✗ Opaque OTC trades</div><div class="cmp-row bad">✗ Fraud possible</div></div>
+            <div class="cmp-col"><div class="cmp-head" style="color:var(--green);">AFTER</div><div class="cmp-row">✓ One on-chain registry</div><div class="cmp-row">✓ Real-time settlement</div><div class="cmp-row">✓ Public audit trail</div><div class="cmp-row">✓ Impossible to fake</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<section id="workflow" class="deepdive band-green">
+  <p class="s-label">// Workflow</p>
+  <h2 class="s-head">From emission cap to retired credit in four steps.</h2>
+  <p class="s-body">The demo illustrates the same lifecycle modeled here: issuance, tokenization, exchange, and permanent retirement at the compliance boundary.</p>
+  <div class="steps-row">
+    <div class="step"><div class="step-n">01</div><span class="step-tag">CAP</span><h3>Limit is Set</h3><p>The EU sets a hard annual cap on GHG emissions. Allowances (EUAs) are issued — one per permitted tonne of CO₂ equivalent.</p></div>
+    <div class="step"><div class="step-n">02</div><span class="step-tag">TOKENIZE</span><h3>Credits Go On-Chain</h3><p>Each EUA is tokenized on CARBON. The on-chain registry becomes the single source of truth — no parallel paper record.</p></div>
+    <div class="step"><div class="step-n">03</div><span class="step-tag">TRADE</span><h3>Companies Trade Directly</h3><p>Surplus sellers list credits. Deficit buyers buy them. Settlement is atomic, instant, and public. No broker. No 18-month lag.</p></div>
+    <div class="step"><div class="step-n">04</div><span class="step-tag">RETIRE</span><h3>Credits Are Burned</h3><p>At the compliance deadline, credits are submitted and burned on-chain permanently. Reuse becomes cryptographically impossible.</p></div>
+  </div>
+</section>
+
+<section class="demo-cta">
+  <p class="s-label" style="justify-content:center;">// Next Steps</p>
+  <h2 class="s-head" style="margin:0 auto;text-align:center;">Ready to explore the full market story?</h2>
+  <p class="s-body" style="margin:18px auto 0;text-align:center;">Return to the landing page for the EU ETS context, problem framing, and Sea-Twelve background.</p>
+  <div class="cta-btns">
+    <a href="carbon-landing.html" class="btn-p">Back to Landing →</a>
+    <a href="mailto:hello@carbon.exchange" class="btn-g">Contact Us</a>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-logo"><span style="width:8px;height:8px;border-radius:3px;background:var(--green);display:inline-block;"></span>CARBON</div>
+  <ul class="foot-links">
+    <li><a href="carbon-landing.html#system">The System</a></li>
+    <li><a href="carbon-landing.html#problem">The Problem</a></li>
+    <li><a href="carbon-landing.html#solution">Solution</a></li>
+    <li><a href="carbon-landing.html#how">How It Works</a></li>
+    <li><a href="carbon-landing.html#about">About</a></li>
+  </ul>
+  <div class="foot-copy">© 2025 Sea-Twelve · EU ETS Compliant</div>
+</footer>
+
+</body>
+</html>
