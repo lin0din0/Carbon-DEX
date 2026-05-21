@@ -3,552 +3,1485 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CARBON — EU ETS Decentralized Exchange</title>
+<meta name="description" content="CARBON: EU ETS aligned decentralized exchange. On-chain carbon credit registry, direct settlement, and a public ledger for the European carbon market.">
+<meta name="theme-color" content="#000000">
+<title>CARBON · EU ETS Decentralized Exchange</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,300;0,400;0,600;1,300&family=Inter:ital,wght@0,200;0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #1d1d1d;
-  --green: #62d65c;
-  --white: #ffffff;
-  --glass: rgba(255,255,255,0.07);
-  --glass-border: rgba(255,255,255,0.1);
-  --green-glass: rgba(98,214,92,0.07);
-  --green-border: rgba(98,214,92,0.22);
-  --pad: 120px 80px;
+  --bg: #000000;
+  --fg: #ffffff;
+  --muted: rgba(255, 255, 255, 0.45);
+  --dim: rgba(255, 255, 255, 0.22);
+  --line: #333333;
+  --line-soft: #252525;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --sans: "Inter", system-ui, sans-serif;
+  --pad-x: clamp(24px, 5vw, 80px);
+  --pad-y: clamp(72px, 12vw, 140px);
+  --accent: #62d65c;
 }
 
-html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  overflow-x: hidden;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
 
-/* NAV */
+a { color: inherit; }
+a:focus-visible {
+  outline: 1px solid var(--fg);
+  outline-offset: 3px;
+}
+button:focus-visible {
+  outline: 1px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  z-index: 400;
+  padding: 12px 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: var(--fg);
+  color: var(--bg);
+}
+.skip:focus {
+  left: var(--pad-x);
+  top: 12px;
+}
+
+/* ——— NAV ——— */
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 56px;
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-  background: rgba(29,29,29,0.78);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px var(--pad-x);
+  background: rgba(0, 0, 0, 0.92);
+  border-bottom: 1px solid var(--line-soft);
 }
-.nav-logo {
-  font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 400; letter-spacing: 2px;
-  color: var(--white); display: flex; align-items: center; gap: 10px; text-decoration: none;
+.nav-brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
 }
-.nav-dot { width: 9px; height: 9px; border-radius: 3px; background: var(--green); animation: pulse 2.5s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
-.nav-links { display: flex; gap: 32px; list-style: none; }
-.nav-links a { font-family: 'Source Code Pro', monospace; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.42); text-decoration: none; letter-spacing: 0.5px; transition: color .2s; }
-.nav-links a:hover { color: var(--green); }
-.nav-cta { font-family: 'Source Code Pro', monospace; font-size: 12px; font-weight: 400; color: var(--bg); background: var(--green); border: none; padding: 9px 22px; border-radius: 6px; cursor: pointer; letter-spacing: 0.5px; text-decoration: none; transition: opacity .2s, transform .15s; }
-.nav-cta:hover { opacity: .85; transform: translateY(-1px); }
-
-/* HERO */
-#hero { min-height: 100vh; padding: 140px 80px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-.hero-eyebrow { font-family: 'Source Code Pro', monospace; font-size: 12px; font-weight: 300; color: var(--green); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 40px; }
-.hero-logo-bar {
-  width: 100%; max-width: 600px; margin-bottom: 36px;
-  padding: clamp(22px, 4vw, 36px) clamp(28px, 5vw, 44px);
-  border-radius: 22px;
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.07) 55%, rgba(255, 255, 255, 0.05) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
-  box-shadow:
-    0 12px 48px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+.nav-brand:hover { opacity: 0.85; }
+/* ——— Logo glass cards (true-color logo: light frosted panel) ——— */
+.logo-glass {
+  --lg-a: rgba(255, 255, 255, 0.5);
+  --lg-b: rgba(255, 255, 255, 0.3);
+  --lg-c: rgba(255, 255, 255, 0.22);
+  display: inline-flex;
+  align-items: center;
   position: relative;
   overflow: hidden;
-  animation: fadeUp .9s ease both;
+  background: linear-gradient(168deg, var(--lg-a) 0%, var(--lg-b) 48%, var(--lg-c) 100%);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-radius: 14px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 14px 44px rgba(0, 0, 0, 0.28);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.hero-logo-bar::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+.logo-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    transparent 44%,
+    transparent 100%
+  );
   pointer-events: none;
 }
-.hero-logo-bar .hero-logo {
-  width: 100%; height: auto; display: block;
-  filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.15));
+.logo-glass img {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.08));
 }
-@keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
-.hero-sub { font-family: 'Source Code Pro', monospace; font-size: 17px; font-weight: 300; color: rgba(255,255,255,0.55); line-height: 1.75; max-width: 540px; margin-bottom: 44px; animation: fadeUp .9s .2s ease both; }
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; animation: fadeUp .9s .35s ease both; }
-.hero-right { display: flex; align-items: center; justify-content: center; animation: fadeUp .9s .15s ease both; }
-.hero-right img { width: 100%; max-width: 560px; }
+.logo-glass--hero { padding: clamp(14px, 2.5vw, 22px) clamp(18px, 3vw, 28px); }
+.logo-glass--foot { padding: 5px 11px 6px; }
+.hero-logo-link:hover .logo-glass {
+  --lg-a: rgba(255, 255, 255, 0.58);
+  --lg-b: rgba(255, 255, 255, 0.36);
+  --lg-c: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.48);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 16px 48px rgba(0, 0, 0, 0.32);
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--fg);
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.nav-links a:hover { color: var(--muted); }
+.nav-links a.active {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.nav-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -6px -8px -6px 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.nav-toggle:hover { border-color: var(--muted); color: var(--muted); }
 
-/* BUTTONS */
-.btn-p { font-family: 'Source Code Pro', monospace; font-size: 14px; font-weight: 400; color: var(--bg); background: var(--green); border: none; padding: 13px 30px; border-radius: 8px; cursor: pointer; letter-spacing: .5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: opacity .2s, transform .15s; }
-.btn-p:hover { opacity: .88; transform: translateY(-2px); }
-.btn-g { font-family: 'Source Code Pro', monospace; font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.6); background: var(--glass); border: 1px solid var(--glass-border); padding: 13px 30px; border-radius: 8px; cursor: pointer; letter-spacing: .5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; backdrop-filter: blur(12px); transition: background .2s, color .2s, transform .15s; }
-.btn-g:hover { background: rgba(255,255,255,0.13); color: var(--white); transform: translateY(-2px); }
+/* ——— HERO ——— */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: calc(72px + 48px) var(--pad-x) var(--pad-y);
+  overflow: hidden;
+}
+#hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    rgba(0, 0, 0, 0.94) 0%,
+    rgba(0, 0, 0, 0.82) 38%,
+    rgba(0, 0, 0, 0.45) 58%,
+    rgba(0, 0, 0, 0.12) 78%,
+    transparent 100%
+  );
+}
+.hero-lattice-bg {
+  position: absolute;
+  z-index: 0;
+  width: min(165vw, 1280px);
+  height: min(135vh, 960px);
+  right: -18%;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  pointer-events: auto;
+}
+.hero-logo-link {
+  display: inline-block;
+  margin-bottom: clamp(24px, 4vw, 40px);
+  text-decoration: none;
+}
+.hero-logo-img {
+  width: 100%;
+  max-width: min(340px, 72vw);
+  height: auto;
+  display: block;
+}
+.hero-h1 {
+  font-family: var(--sans);
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 200;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+  color: var(--fg);
+}
+.hero-row {
+  margin-top: clamp(32px, 4vw, 48px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px 28px;
+}
+.hero-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--fg);
+  border: 1px solid var(--fg);
+  padding: 14px 22px 14px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.2s, color 0.2s;
+}
+.hero-btn::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: var(--fg);
+  flex-shrink: 0;
+}
+.hero-btn:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+.hero-btn:hover::before { background: var(--bg); }
+.hero-or {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+}
+.hero-mail {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: 1px solid var(--dim);
+  padding-bottom: 2px;
+}
+.hero-mail:hover { border-bottom-color: var(--fg); }
+.hero-lattice {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.hero-lattice canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-copy > .hero-logo-link,
+  .hero-copy > .hero-h1,
+  .hero-copy > .hero-row {
+    animation: heroIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero-copy > .hero-h1 { animation-delay: 0.06s; }
+  .hero-copy > .hero-row { animation-delay: 0.12s; }
+}
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-/* TICKER */
-.ticker-wrap { overflow: hidden; padding: 13px 0; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.015); }
-.ticker { display: flex; gap: 56px; width: max-content; animation: tick 22s linear infinite; }
-.ticker-item { font-family: 'Source Code Pro', monospace; font-size: 11px; font-weight: 300; color: rgba(255,255,255,0.26); letter-spacing: 2.5px; text-transform: uppercase; white-space: nowrap; }
-.ticker-item .g { color: var(--green); margin-right: 10px; }
-@keyframes tick { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+/* ——— RULE ——— */
+.rule {
+  height: 1px;
+  background: var(--line);
+  margin: 0 var(--pad-x);
+}
 
-/* RULE */
-.rule { width: calc(100% - 160px); margin: 0 80px; height: 1px; background: rgba(255,255,255,0.07); }
+/* ——— TICKER ——— */
+.ticker-strip {
+  overflow: hidden;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 10px 0;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.ticker-strip-inner {
+  display: flex;
+  width: max-content;
+  gap: 48px;
+  animation: ticker 28s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-strip-inner { animation: none; flex-wrap: wrap; justify-content: center; width: 100%; gap: 12px 24px; padding: 0 var(--pad-x); }
+}
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
 
-/* SECTION TYPOGRAPHY */
-.s-label { font-family: 'Source Code Pro', monospace; font-size: 11px; font-weight: 300; color: var(--green); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
-.s-label::after { content: ''; flex: 1; max-width: 56px; height: 1px; background: var(--green); opacity: .4; }
-.s-head { font-family: 'Inter', sans-serif; font-size: clamp(28px,3.6vw,50px); font-weight: 400; color: var(--white); letter-spacing: -1.5px; line-height: 1.12; max-width: 820px; }
-.s-body { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.52); line-height: 1.78; max-width: 580px; margin-top: 18px; }
+/* ——— INFO BAND (reference 3-col) ——— */
+.info-band {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 0.95fr;
+  gap: clamp(28px, 4vw, 56px);
+  padding: clamp(48px, 8vw, 96px) var(--pad-x);
+  border-bottom: 1px solid var(--line-soft);
+}
+.info-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.process-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.process-list li {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg);
+  line-height: 1.4;
+}
+.info-mid {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 2;
+  max-width: 52ch;
+}
+.connect-box {
+  border: 1px solid var(--line);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.connect-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin-bottom: 24px;
+}
+.connect-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+}
+.connect-links a {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: var(--fg);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.connect-links a::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: var(--fg);
+  flex-shrink: 0;
+}
+.connect-links a:hover { color: var(--muted); }
+.connect-foot {
+  margin-top: auto;
+  padding-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
 
-/* STORY 2-COL */
-.story { padding: var(--pad); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-.story.flip { direction: rtl; }
-.story.flip > * { direction: ltr; }
-.story-img { display: flex; align-items: center; justify-content: center; }
-.story-img img { width: 100%; max-width: 500px; filter: drop-shadow(0 24px 64px rgba(0,0,0,0.55)); }
+/* ——— SECTIONS ——— */
+.section {
+  padding: var(--pad-y) var(--pad-x);
+  border-bottom: 1px solid var(--line-soft);
+}
+.section-head {
+  font-family: var(--sans);
+  font-size: clamp(30px, 4vw, 56px);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  max-width: 18ch;
+  margin-bottom: 28px;
+}
+.section-kicker {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-kicker::before {
+  content: '//';
+  font-weight: 300;
+  letter-spacing: 0;
+  opacity: 0.55;
+  flex-shrink: 0;
+}
+.section-body {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--muted);
+  max-width: 560px;
+}
+.section-body + .section-body { margin-top: 16px; }
 
-/* BANDS */
-.band-dark { background: rgba(0,0,0,0.22); }
-.band-green { background: rgba(98,214,92,0.03); border-top: 1px solid rgba(98,214,92,0.08); border-bottom: 1px solid rgba(98,214,92,0.08); }
+.story-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 6vw, 80px);
+  align-items: center;
+}
+.story-grid.flip .story-text { order: 2; }
+.story-grid.flip .story-media { order: 1; }
+.story-grid.story-solo {
+  grid-template-columns: 1fr;
+  max-width: 720px;
+}
+.story-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.story-media img {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 0;
+  filter: grayscale(1) contrast(1.04);
+  display: block;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.story-media:hover img { transform: scale(1.04); }
+.story-media img.no-round { border-radius: 0; }
 
-/* GLASS CARD */
-.gc { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 28px 24px; backdrop-filter: blur(20px); position: relative; overflow: hidden; }
-.gc::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent); }
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 48px;
+}
+.stat-cell {
+  background: var(--bg);
+  padding: 28px 22px;
+}
+.stat-val {
+  font-family: var(--sans);
+  font-size: clamp(30px, 3.5vw, 46px);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stat-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  margin-top: 10px;
+}
 
-/* STATS */
-#stats { padding: 80px 80px; display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
-.stat-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 30px 26px; backdrop-filter: blur(20px); transition: transform .2s, border-color .2s; }
-.stat-card:hover { transform: translateY(-4px); border-color: var(--green-border); }
-.s-lbl { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.36); margin-bottom: 10px; }
-.s-val { font-family: 'Inter', sans-serif; font-size: clamp(36px,3.5vw,54px); font-weight: 700; color: var(--white); letter-spacing: -2px; line-height: 1; margin-bottom: 4px; }
-.s-val.g { color: var(--green); }
-.s-sub { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.36); }
+.prob-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 48px;
+}
+.prob-cell {
+  background: var(--bg);
+  padding: 28px 24px;
+}
+.prob-cell h3 {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  color: var(--fg);
+}
+.prob-cell p {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--muted);
+}
 
-/* PROBLEM GRID */
-.prob-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 56px; }
-.prob-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 28px 24px; backdrop-filter: blur(20px); transition: transform .2s, border-color .2s; }
-.prob-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.18); }
-.prob-icon { font-size: 20px; margin-bottom: 14px; display: block; }
-.prob-card h3 { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
-.prob-card p { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.42); line-height: 1.7; }
+.big-num {
+  margin-top: 40px;
+  font-family: var(--sans);
+  font-size: clamp(64px, 12vw, 144px);
+  font-weight: 200;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+.big-num-cap {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 12px;
+}
 
-/* MINI STAT CARDS */
-.mini-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 32px; }
-.mini-c { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; padding: 22px 20px; backdrop-filter: blur(16px); }
-.mini-v { font-family: 'Inter', sans-serif; font-size: clamp(36px,3.5vw,52px); font-weight: 700; color: var(--white); letter-spacing: -2px; line-height: 1; margin-bottom: 4px; }
-.mini-v.g { color: var(--green); }
-.mini-l { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 300; color: rgba(255,255,255,0.35); margin-bottom: 8px; }
-.mini-u { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.35); }
+.box-outline {
+  margin-top: 32px;
+  border: 1px solid var(--line);
+  padding: 24px;
+}
+.box-outline .inner-k {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.inv-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.inv-gap {
+  color: var(--dim);
+}
+.inv-unknown {
+  border: 1px dashed var(--line);
+  padding: 8px 14px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
 
-/* CHAIN FLOW */
-.chain-visual { display: flex; flex-direction: column; gap: 14px; }
-.chain-block { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; padding: 20px 22px; backdrop-filter: blur(16px); position: relative; overflow: hidden; }
-.chain-block::after { content:''; position:absolute; inset:0; background: linear-gradient(135deg,rgba(98,214,92,0.05) 0%,transparent 60%); pointer-events:none; }
-.c-lbl { font-family: 'Source Code Pro', monospace; font-size: 10px; font-weight: 300; color: var(--green); letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 12px; }
-.c-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.c-node { font-family: 'Source Code Pro', monospace; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; white-space: nowrap; }
-.c-node.g { background: rgba(98,214,92,0.12); border-color: rgba(98,214,92,0.28); color: var(--green); }
-.c-arr { color: rgba(255,255,255,0.2); font-size: 15px; }
-.c-note { font-family: 'Source Code Pro', monospace; font-size: 11px; font-weight: 300; color: rgba(255,255,255,0.22); margin-top: 10px; letter-spacing: .5px; }
+.pen-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 32px;
+}
+.pen-cell {
+  background: var(--bg);
+  padding: 24px;
+}
+.pen-cell .pv {
+  font-family: var(--sans);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.pen-cell .pl {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.pen-cell .pu {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  margin-top: 8px;
+}
 
-/* FEATURE LIST */
-.feat-list { display: flex; flex-direction: column; gap: 14px; margin-top: 32px; }
-.feat { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 12px; backdrop-filter: blur(12px); transition: background .2s, border-color .2s; }
-.feat:hover { background: var(--green-glass); border-color: var(--green-border); }
-.feat-ic { width: 32px; height: 32px; border-radius: 8px; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
-.feat h4 { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
-.feat p { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.42); line-height: 1.6; }
+.arch-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.arch-list div {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-left: 16px;
+  border-left: 1px solid var(--line);
+}
 
-/* STEPS */
-.steps-row { display: grid; grid-template-columns: repeat(4,1fr); margin-top: 60px; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden; }
-.step { padding: 38px 28px; background: var(--glass); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.06); transition: background .2s; }
-.step:last-child { border-right: none; }
-.step:hover { background: rgba(255,255,255,0.1); }
-.step-n { font-family: 'Inter', sans-serif; font-size: 42px; font-weight: 400; color: rgba(255,255,255,0.07); line-height: 1; margin-bottom: 14px; }
-.step-tag { display: inline-block; font-family: 'Source Code Pro', monospace; font-size: 10px; color: var(--green); background: rgba(98,214,92,0.1); border: 1px solid rgba(98,214,92,0.2); padding: 3px 9px; border-radius: 4px; margin-bottom: 14px; letter-spacing: 1px; }
-.step h3 { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
-.step p { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.4); line-height: 1.7; }
+.solution-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 5vw, 72px);
+  align-items: start;
+}
+.feat-stack { margin-top: 36px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.feat-item {
+  background: var(--bg);
+  padding: 20px 22px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.feat-item::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--fg);
+  margin-top: 6px;
+}
+.feat-item h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.feat-item p {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.6;
+}
 
-/* PENALTY */
-.pen-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 32px; }
-.pen-c { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; padding: 26px 22px; backdrop-filter: blur(16px); }
-.pen-l { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 300; color: rgba(255,255,255,0.33); margin-bottom: 10px; }
-.pen-v { font-family: 'Inter', sans-serif; font-size: clamp(40px,4vw,58px); font-weight: 700; color: var(--white); letter-spacing: -2.5px; line-height: 1; margin-bottom: 4px; }
-.pen-u { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.35); }
+.chain-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.chain-block {
+  background: var(--bg);
+  padding: 22px;
+}
+.chain-block .ck {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.chain-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.chain-flow span {
+  border: 1px solid var(--line);
+  padding: 6px 12px;
+  color: var(--muted);
+}
+.chain-flow span.em { color: var(--fg); border-color: var(--fg); }
+.chain-note {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  margin-top: 12px;
+  letter-spacing: 0.06em;
+}
+.compare-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 12px;
+}
+.compare-2 h5 {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  margin-bottom: 12px;
+  color: var(--dim);
+}
+.compare-2 h5.after { color: var(--fg); }
+.compare-2 ul { list-style: none; padding: 0; margin: 0; }
+.compare-2 li {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.compare-2 .before-col li { color: var(--dim); }
 
-/* CTA */
-#cta { padding: 140px 80px; text-align: center; position: relative; overflow: hidden; }
-#cta::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:700px; height:480px; background:radial-gradient(ellipse,rgba(98,214,92,0.09) 0%,transparent 70%); pointer-events:none; }
-.cta-title { font-family: 'Inter', sans-serif; font-size: clamp(30px,5vw,64px); font-weight: 400; color: var(--white); letter-spacing: -2.5px; line-height: 1.08; margin-bottom: 20px; }
-.cta-title span { color: var(--green); }
-.cta-sub { font-family: 'Source Code Pro', monospace; font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.32); margin-bottom: 44px; }
-.cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-.cta-foot { margin-top: 44px; font-family: 'Source Code Pro', monospace; font-size: 10px; color: rgba(255,255,255,0.16); letter-spacing: 2px; }
+/* ——— BEFORE / AFTER FULL-WIDTH ——— */
+.ba-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 56px;
+}
+.ba-panel {
+  padding: 40px 36px;
+  transition: background 0.25s;
+}
+.ba-panel.before { background: rgba(255,255,255,0.018); }
+.ba-panel.after  { background: rgba(98,214,92,0.04); }
+.ba-panel.after:hover { background: rgba(98,214,92,0.08); }
+.ba-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.ba-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.ba-panel.before .ba-label { color: var(--muted); }
+.ba-panel.after  .ba-label { color: var(--accent); }
+.ba-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border: 1px solid;
+}
+.ba-panel.before .ba-tag { color: var(--dim);    border-color: var(--line); }
+.ba-panel.after  .ba-tag { color: var(--accent); border-color: rgba(98,214,92,0.3); }
+.ba-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+.ba-list li {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  line-height: 1.55;
+}
+.ba-list li::before {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.ba-panel.before .ba-list li { color: var(--muted); }
+.ba-panel.before .ba-list li::before { border: 1px solid rgba(255,255,255,0.3); }
+.ba-panel.after  .ba-list li { color: var(--fg); }
+.ba-panel.after  .ba-list li::before { background: var(--accent); }
 
-/* ABOUT GRID */
-.about-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 48px; }
-.about-c { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 26px 22px; backdrop-filter: blur(20px); }
-.about-c span { font-size: 24px; display: block; margin-bottom: 14px; }
-.about-c h3 { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
-.about-c p { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.4); line-height: 1.7; }
+.steps-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 48px;
+}
+.step-cell {
+  background: var(--bg);
+  padding: 28px 20px;
+}
+.step-cell .sn {
+  font-family: var(--sans);
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--line);
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.step-cell .st {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  margin-bottom: 12px;
+  color: var(--fg);
+}
+.step-cell h3 {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.step-cell p {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.65;
+}
 
-/* FOOTER */
-footer { padding: 42px 80px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; }
-.foot-logo { font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 400; color: rgba(255,255,255,0.28); letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
-.foot-links { display: flex; gap: 24px; list-style: none; }
-.foot-links a { font-family: 'Source Code Pro', monospace; font-size: 11px; font-weight: 300; color: rgba(255,255,255,0.22); text-decoration: none; transition: color .2s; }
-.foot-links a:hover { color: rgba(255,255,255,0.6); }
-.foot-copy { font-family: 'Source Code Pro', monospace; font-size: 10px; font-weight: 300; color: rgba(255,255,255,0.16); }
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 40px;
+}
+.about-cell {
+  background: var(--bg);
+  padding: 24px 20px;
+}
+.about-cell h3 {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.about-cell p {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.6;
+}
 
-/* INVISIBLE BOX visual */
-.invisible-box { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; padding: 26px; backdrop-filter: blur(16px); margin-top: 32px; }
-.inv-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.inv-node { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.32); }
-.inv-hidden { padding: 8px 16px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.18); }
-.inv-arr { font-size: 18px; color: rgba(255,255,255,0.1); }
+#cta {
+  padding: clamp(80px, 14vw, 160px) var(--pad-x);
+  text-align: center;
+  border-bottom: 1px solid var(--line-soft);
+}
+.cta-h2 {
+  font-family: var(--sans);
+  font-size: clamp(36px, 5.5vw, 72px);
+  font-weight: 200;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  max-width: 16ch;
+  margin: 0 auto 20px;
+}
+.cta-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 40px;
+}
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+.cta-actions a {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 14px 28px;
+  border: 1px solid var(--fg);
+  color: var(--fg);
+  transition: background 0.2s, color 0.2s;
+}
+.cta-actions a.primary {
+  background: var(--fg);
+  color: var(--bg);
+}
+.cta-actions a.ghost:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+.cta-actions a.primary:hover {
+  background: transparent;
+  color: var(--fg);
+}
+.cta-src {
+  margin-top: 48px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
 
-/* COMPARE GRID */
-.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.cmp-col { display: flex; flex-direction: column; gap: 6px; }
-.cmp-head { font-family: 'Source Code Pro', monospace; font-size: 10px; letter-spacing: 2px; margin-bottom: 8px; }
-.cmp-row { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.55); }
-.cmp-row.bad { color: rgba(255,255,255,0.28); }
+footer {
+  padding: 32px var(--pad-x) 48px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.foot-brand {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.foot-logo-img {
+  height: 18px;
+  width: auto;
+  display: block;
+}
+.foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  list-style: none;
+}
+.foot-links a {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+}
+.foot-links a:hover { color: var(--fg); }
 
-/* RESPONSIVE */
+.source-note {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 24px;
+}
+
+/* VIDEO EMBED */
+.video-shell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-top: 40px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+.video-shell iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ——— CELL HOVER STATES ——— */
+.stat-cell {
+  transition: background 0.25s;
+  cursor: default;
+}
+.stat-cell:hover { background: rgba(255,255,255,0.03); }
+.stat-cell:hover .stat-val { color: var(--accent); }
+
+.step-cell { transition: background 0.25s; }
+.step-cell:hover { background: rgba(255,255,255,0.03); }
+
+.prob-cell { transition: background 0.25s; }
+.prob-cell:hover { background: rgba(255,255,255,0.03); }
+.prob-cell:hover h3 { color: var(--accent); }
+
+.about-cell { transition: background 0.25s; }
+.about-cell:hover { background: rgba(255,255,255,0.03); }
+
+.feat-item { transition: background 0.25s; cursor: default; }
+.feat-item:hover { background: rgba(255,255,255,0.03); }
+
+/* ——— SCROLL REVEAL ——— */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ——— NAV CLOCK ——— */
+.nav-clock {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  white-space: nowrap;
+  margin-right: 4px;
+  user-select: none;
+}
+
 @media (max-width: 960px) {
-  :root { --pad: 72px 24px; }
-  nav { padding: 16px 24px; }
-  .nav-links { display: none; }
-  #hero, #stats { padding-left: 24px; padding-right: 24px; }
-  #hero { grid-template-columns: 1fr; padding-top: 110px; }
-  .hero-right { display: none; }
-  #stats { grid-template-columns: 1fr 1fr; padding: 40px 24px; }
-  .story { grid-template-columns: 1fr; gap: 36px; }
-  .story.flip { direction: ltr; }
-  .prob-grid { grid-template-columns: 1fr 1fr; }
-  .steps-row { grid-template-columns: 1fr 1fr; }
+  .nav-clock { display: none; }
+  .nav-links { gap: 4px; }
+  .nav-links a { padding: 8px 12px; font-size: 10px; }
+  #hero { min-height: auto; padding-bottom: clamp(80px, 14vw, 120px); }
+  .hero-lattice-bg {
+    width: 130vw;
+    height: 70vh;
+    min-height: 420px;
+    right: -25%;
+    top: 42%;
+    opacity: 0.85;
+  }
+  .info-band { grid-template-columns: 1fr; }
+  .story-grid, .story-grid.flip .story-text, .story-grid.flip .story-media { order: unset; }
+  .story-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .prob-grid { grid-template-columns: 1fr; }
+  .solution-split { grid-template-columns: 1fr; }
+  .ba-split { grid-template-columns: 1fr; }
+  .steps-bar { grid-template-columns: 1fr 1fr; }
   .about-grid { grid-template-columns: 1fr 1fr; }
-  .rule { width: calc(100% - 48px); margin: 0 24px; }
-  footer { padding: 32px 24px; flex-direction: column; text-align: center; }
-  #cta { padding: 80px 24px; }
+}
+@media (max-width: 720px) {
+  .nav-toggle { display: inline-flex; }
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 61px;
+    left: 0;
+    right: 0;
+    z-index: 199;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px var(--pad-x) 20px;
+    background: rgba(0, 0, 0, 0.98);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-links a {
+    padding: 14px 12px;
+    font-size: 11px;
+    border-color: transparent;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav-links a:last-child { border-bottom: none; }
+  nav.is-open .nav-links { display: flex; }
+}
+@media (max-width: 520px) {
+  .stats-row, .steps-bar, .about-grid { grid-template-columns: 1fr; }
 }
 </style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
 </head>
 <body>
 
-<!-- NAV -->
+<a class="skip" href="#main">Skip to content</a>
+
 <nav>
-  <a href="#" class="nav-logo"><span class="nav-dot"></span>CARBON</a>
-  <ul class="nav-links">
-    <li><a href="#system">The System</a></li>
-    <li><a href="#problem">The Problem</a></li>
-    <li><a href="#solution">Solution</a></li>
-    <li><a href="#how">How It Works</a></li>
-    <li><a href="#about">About</a></li>
+  <a class="nav-brand" href="#hero" aria-label="Carbon home">Carbon</a>
+  <div class="nav-end">
+  <span class="nav-clock" id="nav-clock" aria-hidden="true"></span>
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">Menu</button>
+  <ul id="nav-menu" class="nav-links">
+    <li><a class="active" href="#hero">Index</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#product">Build</a></li>
+    <li><a href="#context">Context</a></li>
   </ul>
-  <a href="demo.html" class="nav-cta">View Demo →</a>
+  </div>
 </nav>
 
-
-<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<main id="main">
 <section id="hero">
-  <div>
-    <p class="hero-eyebrow">// by Sea-Twelve</p>
-    <div class="hero-logo-bar">
-      <img class="hero-logo" src="carbonlogo.svg" alt="Carbon" width="830" height="391" decoding="async">
-    </div>
-    <p class="hero-sub">EU ETS compliant carbon credits —<br>decentralized exchange.</p>
-    <div class="hero-actions">
-      <a href="demo.html" class="btn-p">View Demo →</a>
-    </div>
+  <div class="hero-lattice-bg" aria-hidden="true">
+    <div id="hero-lattice" class="hero-lattice"></div>
   </div>
-  <div class="hero-right">
-    <img src="carbonsymbol_illustration.svg" alt="Carbon illustration">
+  <div class="hero-copy">
+    <a class="hero-logo-link" href="#hero" aria-label="Carbon">
+      <span class="logo-glass logo-glass--hero">
+        <img class="hero-logo-img" src="CarbonLOGO.svg" alt="" width="830" height="391" decoding="async">
+      </span>
+    </a>
+    <h1 class="hero-h1">Ready to give the EU carbon market a public ledger</h1>
+    <div class="hero-row">
+      <a class="hero-btn" href="#demo">Watch the demo</a>
+    </div>
   </div>
 </section>
 
-<!-- TICKER -->
-<div class="ticker-wrap">
-  <div class="ticker">
-    <span class="ticker-item"><span class="g">◆</span>EU ETS COMPLIANT</span>
-    <span class="ticker-item"><span class="g">◆</span>ON-CHAIN SETTLEMENT</span>
-    <span class="ticker-item"><span class="g">◆</span>TRACEABLE CREDITS</span>
-    <span class="ticker-item"><span class="g">◆</span>€881B ANNUAL MARKET</span>
-    <span class="ticker-item"><span class="g">◆</span>ZERO DOUBLE-COUNTING</span>
-    <span class="ticker-item"><span class="g">◆</span>REAL-TIME TRANSPARENCY</span>
-    <span class="ticker-item"><span class="g">◆</span>SEA-TWELVE</span>
-    <span class="ticker-item"><span class="g">◆</span>EU ETS COMPLIANT</span>
-    <span class="ticker-item"><span class="g">◆</span>ON-CHAIN SETTLEMENT</span>
-    <span class="ticker-item"><span class="g">◆</span>TRACEABLE CREDITS</span>
-    <span class="ticker-item"><span class="g">◆</span>€881B ANNUAL MARKET</span>
-    <span class="ticker-item"><span class="g">◆</span>ZERO DOUBLE-COUNTING</span>
-    <span class="ticker-item"><span class="g">◆</span>REAL-TIME TRANSPARENCY</span>
-    <span class="ticker-item"><span class="g">◆</span>SEA-TWELVE</span>
+<div class="rule"></div>
+
+<div class="ticker-strip" aria-hidden="true">
+  <div class="ticker-strip-inner">
+    <span>EU ETS aligned</span><span>On-chain settlement</span><span>Traceable EUAs</span><span>€881B market</span><span>No double counting</span><span>Real-time book</span><span>CARBON</span>
+    <span>EU ETS aligned</span><span>On-chain settlement</span><span>Traceable EUAs</span><span>€881B market</span><span>No double counting</span><span>Real-time book</span><span>CARBON</span>
   </div>
 </div>
 
-<!-- STATS -->
-<section id="stats">
-  <div class="stat-card"><div class="s-lbl">EU ETS-covered emissions</div><div class="s-val g">50%</div><div class="s-sub">below 2005 levels</div></div>
-  <div class="stat-card"><div class="s-lbl">Annual trading volume</div><div class="s-val">€881B</div><div class="s-sub">EU carbon market</div></div>
-  <div class="stat-card"><div class="s-lbl">Single-year reduction 2023</div><div class="s-val g">15.5%</div><div class="s-sub">emissions reduction</div></div>
-  <div class="stat-card"><div class="s-lbl">Daily spot trading</div><div class="s-val">€3B</div><div class="s-sub">per day</div></div>
-</section>
-
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ SLIDE: EU ETS CAP EXPLAINED ═══════════════════ -->
-<section id="system" class="story band-dark">
-  <div class="story-img">
-    <img src="EUETS_cap_illustration.svg" alt="EU ETS Cap" style="border-radius:50%;">
-  </div>
-  <div>
-    <p class="s-label">// The Current System</p>
-    <h2 class="s-head">The EU ETS operates as a cap-and-trade system.</h2>
-    <p class="s-body">A hard limit is set on total yearly greenhouse gas emissions. Allowances are issued — one per tonne of CO₂ equivalent. Companies who cut emissions sell surplus credits. Companies who overpollute must buy more.</p>
-    <div class="mini-pair">
-      <div class="mini-c"><div class="mini-l">EU ETS-covered emissions</div><div class="mini-v">50%</div><div class="mini-u">below 2005 levels</div></div>
-      <div class="mini-c"><div class="mini-l">In 2023 alone</div><div class="mini-v g">15.5%</div><div class="mini-u">emissions reduction</div></div>
-    </div>
-    <p style="font-family:'Source Code Pro',monospace;font-size:10px;font-weight:300;color:rgba(255,255,255,0.18);margin-top:22px;letter-spacing:1.5px;">SOURCE: European Commission 2025 Carbon Market Report · ICAP · Homaio</p>
+<!-- 01 DEMO - the main event -->
+<section id="demo" class="section">
+  <p class="section-kicker">The demo</p>
+  <h2 class="section-head">Here is what we built</h2>
+  <p class="section-body">A working prototype of CARBON: an on-chain exchange layer for EU ETS allowances. Watch the walkthrough, then explore the architecture below.</p>
+  <div class="video-shell">
+    <iframe src="https://www.youtube.com/embed/-uXiNh0QJ5c" title="CARBON product demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </div>
 </section>
 
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ SLIDE: TRADING MARKET ═══════════════════ -->
-<section class="story flip">
-  <div class="story-img">
-    <img src="Company_trade_illustration.svg" alt="Company trading" style="border-radius:50%;">
-  </div>
-  <div>
-    <p class="s-label">// The Market</p>
-    <h2 class="s-head">An €881 billion market — with no public ledger.</h2>
-    <p class="s-body">Surplus companies sell credits. Deficit companies buy them. Every single trade settles through opaque bilateral agreements. There is no single source of truth, no real-time view, no shared registry that anyone can read.</p>
-    <div class="mini-pair">
-      <div class="mini-c"><div class="mini-l">Annual trading volume</div><div class="mini-v">€881B</div><div class="mini-u">per year</div></div>
-      <div class="mini-c"><div class="mini-l">Daily spot volume</div><div class="mini-v">€3B</div><div class="mini-u">per day</div></div>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ SLIDE: THE PROBLEM ═══════════════════ -->
-<section id="problem" class="band-dark" style="padding: var(--pad);">
-  <p class="s-label">// The Problem</p>
-  <h2 class="s-head">But here is the structural flaw.</h2>
-  <p class="s-body">The compliance cycle creates a built-in transparency gap that no one talks about. Regulators are flying blind — and the architecture was never designed to fix it.</p>
-  <div class="prob-grid">
-    <div class="prob-card"><span class="prob-icon">⏱</span><h3>9–18 Month Reporting Lag</h3><p>Emission data for a given year doesn't reach regulators for up to 18 months. No one sees what's actually happening in the market in real time.</p></div>
-    <div class="prob-card"><span class="prob-icon">👁️‍🗨️</span><h3>Opacity</h3><p>Intercompany trades happen invisibly during the compliance window. Regulators can't separate real hedging from speculative risk.</p></div>
-    <div class="prob-card"><span class="prob-icon">⚠️</span><h3>Verification Delays</h3><p>Third-party verifiers must physically audit emission data — expensive, slow, introducing months of uncertainty before any credit is confirmed clean.</p></div>
-    <div class="prob-card"><span class="prob-icon">🔄</span><h3>Fraud & Double Counting</h3><p>Without a single shared registry, the same credit can be presented to multiple buyers. Double-counting is structurally possible — and has occurred.</p></div>
-    <div class="prob-card"><span class="prob-icon">🏛️</span><h3>No Single Source of Truth</h3><p>Data lives across 27 national registries, broker systems, and bilateral contracts. A complete market picture is impossible in real time.</p></div>
-    <div class="prob-card"><span class="prob-icon">📉</span><h3>Market Risk Mispricing</h3><p>Because positions are invisible until compliance deadlines, price discovery is impaired. Late-cycle buying creates artificial volatility.</p></div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ SLIDE: REPORTING LAG ═══════════════════ -->
-<section class="story">
-  <div>
-    <p class="s-label">// The Gap</p>
-    <h2 class="s-head">A reporting lag of 9–18 months.</h2>
-    <p class="s-body">The compliance cycle creates a built-in transparency gap that urgently needs solving. During this time, intercompany trades happen invisibly — no regulator, analyst, or counterparty can see what is moving.</p>
-    <div style="margin-top:32px;">
-      <div style="font-family:'Inter';font-size:clamp(64px,8vw,100px);font-weight:400;color:var(--white);letter-spacing:-5px;line-height:1;">~12</div>
-      <div style="font-family:'Inter';font-size:18px;font-weight:300;color:rgba(255,255,255,0.38);margin-top:4px;">months average lag</div>
-    </div>
-    <div style="margin-top:24px;font-family:'Inter';font-size:14px;font-weight:300;color:rgba(255,255,255,0.35);">Opacity &nbsp;·&nbsp; Verification Delays &nbsp;·&nbsp; Fraud &amp; Double Counting</div>
-  </div>
-  <div class="story-img">
-    <img src="Currentsystemreportinglagillustration.svg" alt="Reporting lag">
-  </div>
-</section>
-
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ SLIDE: INVISIBLE TRADES ═══════════════════ -->
-<section class="story flip band-dark">
-  <div class="story-img">
-    <img src="currentsystem_invisibility_ililustration.svg" alt="Invisible trades">
-  </div>
-  <div>
-    <p class="s-label">// Invisible Trades</p>
-    <h2 class="s-head">During this time, trades happen invisibly.</h2>
-    <p class="s-body">The current compliance system means intercompany trades occur in a black box — no public audit trail, no real-time price signal, no way to verify a credit hasn't already been claimed elsewhere.</p>
-    <div class="invisible-box">
-      <div style="font-family:'Source Code Pro',monospace;font-size:10px;color:var(--green);letter-spacing:2.5px;margin-bottom:14px;">// WHAT REGULATORS SEE</div>
-      <div class="inv-row">
-        <div class="inv-node">Company A</div>
-        <div class="inv-arr">⟶</div>
-        <div class="inv-hidden">??? invisible ???</div>
-        <div class="inv-arr">⟶</div>
-        <div class="inv-node">Company B</div>
-      </div>
-      <div style="font-family:'Inter';font-size:13px;font-weight:300;color:rgba(255,255,255,0.24);margin-top:14px;line-height:1.6;">9–18 months later, the regulator sees an aggregated report. By then, the market has moved on.</div>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ SLIDE: PENALTY ═══════════════════ -->
-<section class="story">
-  <div>
-    <p class="s-label">// Enforcement</p>
-    <h2 class="s-head">€100 per tonne of excess CO₂.</h2>
-    <p class="s-body">Non-compliance is existential. Companies face a €100/tCO₂e penalty — plus mandatory procurement of missing credits at whatever the market price happens to be when they're caught short.</p>
-    <div class="pen-pair">
-      <div class="pen-c"><div class="pen-l">Excess emissions penalty</div><div class="pen-v">€100</div><div class="pen-u">per tonne CO₂e</div></div>
-      <div class="pen-c"><div class="pen-l">WuXi Vaccines paid (2025)</div><div class="pen-v">€480k</div><div class="pen-u">in fines</div></div>
-    </div>
-    <p style="font-family:'Source Code Pro',monospace;font-size:10px;font-weight:300;color:rgba(255,255,255,0.18);margin-top:20px;letter-spacing:1.5px;">SOURCE: European Commission 2025 Carbon Market Report</p>
-  </div>
-  <div class="story-img">
-    <img src="Penalty_illustration.svg" alt="Penalty" style="border-radius:50%;">
-  </div>
-</section>
-
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ SLIDE: CURRENT SYSTEM INFRA ═══════════════════ -->
-<section class="story flip band-dark">
-  <div class="story-img">
-    <img src="Currentsystemillustration.svg" alt="Current system infrastructure">
-  </div>
-  <div>
-    <p class="s-label">// Root Cause</p>
-    <h2 class="s-head">The stack was built before on-chain infrastructure existed.</h2>
-    <p class="s-body">The EU ETS was designed in the early 2000s. It runs on national registries, bilateral brokers, and annual reporting cycles. The mismatch with a €881B real-time market is fundamental — no patch will fix it.</p>
-    <div class="gc" style="margin-top:32px; padding:24px;">
-      <div style="font-family:'Source Code Pro',monospace;font-size:10px;color:rgba(255,255,255,0.22);letter-spacing:2px;margin-bottom:14px;">// CURRENT ARCHITECTURE</div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;">🏛️</span><span style="font-family:'Inter';font-size:13px;font-weight:300;color:rgba(255,255,255,0.38);">27 national registries — siloed, non-interoperable</span></div>
-        <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;">📋</span><span style="font-family:'Inter';font-size:13px;font-weight:300;color:rgba(255,255,255,0.38);">Annual reporting — 9–18 month lag baked in</span></div>
-        <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;">🤝</span><span style="font-family:'Inter';font-size:13px;font-weight:300;color:rgba(255,255,255,0.38);">Bilateral OTC trades — no public audit trail</span></div>
-        <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;">🔍</span><span style="font-family:'Inter';font-size:13px;font-weight:300;color:rgba(255,255,255,0.38);">Third-party verifiers — slow, expensive, fallible</span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ SLIDE: THE SOLUTION ═══════════════════ -->
-<section id="solution" class="band-green" style="padding: var(--pad);">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;">
+<!-- 02 WHAT WE BUILT -->
+<section id="product" class="section">
+  <p class="section-kicker">What we built</p>
+  <h2 class="section-head" style="max-width: 22ch;">One exchange. One registry. Live visibility.</h2>
+  <p class="section-body">CARBON is designed to move issuance, trading, and retirement into a single on-chain protocol. Every credit traces from mint to burn. Every trade settles publicly. Regulators and markets would read the same book. In real time, not 18 months later.</p>
+  <div class="solution-split" style="margin-top: 40px;">
     <div>
-      <p class="s-label">// Our Solution</p>
-      <h2 class="s-head">CARBON replaces the stack with a single on-chain exchange.</h2>
-      <p class="s-body">Companies trade directly. Credits are traceable from mint to retirement. The entire market is readable by anyone, at any time. No broker. No lag. No opacity.</p>
-      <div class="feat-list">
-        <div class="feat"><div class="feat-ic">⛓</div><div><h4>On-Chain Credit Registry</h4><p>Every EUA tokenized on-chain. One immutable registry for the entire EU ETS. No silo. No duplication.</p></div></div>
-        <div class="feat"><div class="feat-ic">⚡</div><div><h4>Direct Company-to-Company Trading</h4><p>Surplus sellers and deficit buyers connect directly. Instant, atomic on-chain settlement. No broker.</p></div></div>
-        <div class="feat"><div class="feat-ic">🔍</div><div><h4>Full Market Transparency</h4><p>Every trade, price, volume — publicly readable. Zero reporting lag. Live view for regulators and markets.</p></div></div>
-        <div class="feat"><div class="feat-ic">✅</div><div><h4>EU ETS Compliant by Design</h4><p>Built within the EU Emissions Trading System framework from day one. Compliance is protocol-level.</p></div></div>
-      </div>
-    </div>
-    <div>
-      <div style="font-family:'Source Code Pro',monospace;font-size:10px;color:rgba(255,255,255,0.22);letter-spacing:2px;margin-bottom:18px;">// HOW IT CHANGES</div>
-      <div class="chain-visual">
-        <div class="chain-block">
-          <div class="c-lbl">// Trade Flow</div>
-          <div class="c-row"><span class="c-node">Company A</span><span class="c-arr">→</span><span class="c-node g">CARBON Exchange</span><span class="c-arr">→</span><span class="c-node">Company B</span></div>
-          <div class="c-note">On-chain · Instant · Auditable · No intermediary</div>
-        </div>
-        <div class="chain-block">
-          <div class="c-lbl">// Credit Lifecycle</div>
-          <div class="c-row"><span class="c-node g">Mint</span><span class="c-arr">→</span><span class="c-node">Trade</span><span class="c-arr">→</span><span class="c-node">Verify</span><span class="c-arr">→</span><span class="c-node g">Retire</span></div>
-          <div class="c-note">Every step on-chain. Zero double-counting. Forever auditable.</div>
-        </div>
-        <div class="chain-block">
-          <div class="c-lbl">// Transparency</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
-            <div style="background:rgba(98,214,92,0.08);border:1px solid rgba(98,214,92,0.18);border-radius:10px;padding:14px;"><div style="font-family:'Inter';font-size:30px;font-weight:400;color:var(--green);letter-spacing:-1.5px;">0ms</div><div style="font-family:'Inter';font-size:11px;font-weight:300;color:rgba(255,255,255,0.3);margin-top:2px;">reporting lag</div></div>
-            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;"><div style="font-family:'Inter';font-size:30px;font-weight:400;color:var(--white);letter-spacing:-1.5px;">∞</div><div style="font-family:'Inter';font-size:11px;font-weight:300;color:rgba(255,255,255,0.3);margin-top:2px;">auditability</div></div>
+      <div class="feat-stack">
+        <div class="feat-item">
+          <div>
+            <h4>On-chain registry</h4>
+            <p>One immutable record for every EUA. No duplicate national silos.</p>
           </div>
         </div>
-        <div class="chain-block">
-          <div class="c-lbl">// Before vs After</div>
-          <div class="compare-grid">
-            <div class="cmp-col"><div class="cmp-head" style="color:rgba(255,255,255,0.2);">BEFORE</div><div class="cmp-row bad">✗ 27 siloed registries</div><div class="cmp-row bad">✗ 9–18mo lag</div><div class="cmp-row bad">✗ Opaque OTC trades</div><div class="cmp-row bad">✗ Fraud possible</div></div>
-            <div class="cmp-col"><div class="cmp-head" style="color:var(--green);">AFTER</div><div class="cmp-row">✓ One on-chain registry</div><div class="cmp-row">✓ Real-time settlement</div><div class="cmp-row">✓ Public audit trail</div><div class="cmp-row">✓ Impossible to fake</div></div>
+        <div class="feat-item">
+          <div>
+            <h4>Direct settlement</h4>
+            <p>Atomic company-to-company trades. No broker. No reconciliation lag.</p>
+          </div>
+        </div>
+        <div class="feat-item">
+          <div>
+            <h4>Live transparency</h4>
+            <p>Volume, prices, and inventory state visible continuously. Not on a PDF.</p>
+          </div>
+        </div>
+        <div class="feat-item">
+          <div>
+            <h4>EU ETS native</h4>
+            <p>Compliance rules encoded at the protocol boundary. Not bolted on top.</p>
           </div>
         </div>
       </div>
     </div>
+    <div>
+      <div class="chain-stack">
+        <div class="chain-block">
+          <div class="ck">[ Trade flow ]</div>
+          <div class="chain-flow">
+            <span>Company A</span>
+            <span>→</span>
+            <span class="em">Carbon</span>
+            <span>→</span>
+            <span>Company B</span>
+          </div>
+          <p class="chain-note">On-chain · auditable · no intermediary</p>
+        </div>
+        <div class="chain-block">
+          <div class="ck">[ Credit lifecycle ]</div>
+          <div class="chain-flow">
+            <span class="em">Mint</span>
+            <span>→</span>
+            <span>Trade</span>
+            <span>→</span>
+            <span>Verify</span>
+            <span>→</span>
+            <span class="em">Retire</span>
+          </div>
+          <p class="chain-note">Each step hash-linked. Reuse cryptographically blocked after burn.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Before / After — full-width system state comparison -->
+  <div class="ba-split">
+    <div class="ba-panel before">
+      <div class="ba-header">
+        <span class="ba-label">Before</span>
+        <span class="ba-tag">Current system</span>
+      </div>
+      <ul class="ba-list">
+        <li>27 siloed national registries</li>
+        <li>9 to 18 month reporting lag</li>
+        <li>Opaque OTC bilateral trades</li>
+        <li>No shared public audit trail</li>
+      </ul>
+    </div>
+    <div class="ba-panel after">
+      <div class="ba-header">
+        <span class="ba-label">After</span>
+        <span class="ba-tag">Carbon</span>
+      </div>
+      <ul class="ba-list">
+        <li>One on-chain registry</li>
+        <li>Real-time settlement and visibility</li>
+        <li>Public audit trail for every trade</li>
+        <li>Double-spend cryptographically blocked</li>
+      </ul>
+    </div>
   </div>
 </section>
 
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ SLIDE: HOW IT WORKS ═══════════════════ -->
-<section id="how" style="padding: var(--pad);">
-  <p class="s-label">// How It Works</p>
-  <h2 class="s-head">From emission cap to on-chain credit in four steps.</h2>
-  <div class="steps-row">
-    <div class="step"><div class="step-n">01</div><span class="step-tag">CAP</span><h3>Limit is Set</h3><p>The EU sets a hard annual cap on GHG emissions. Allowances (EUAs) are issued — one per permitted tonne of CO₂ equivalent.</p></div>
-    <div class="step"><div class="step-n">02</div><span class="step-tag">TOKENIZE</span><h3>Credits Go On-Chain</h3><p>Each EUA is tokenized on CARBON. The on-chain registry becomes the single source of truth — no parallel paper record.</p></div>
-    <div class="step"><div class="step-n">03</div><span class="step-tag">TRADE</span><h3>Companies Trade Directly</h3><p>Surplus sellers list credits. Deficit buyers buy them. Settlement is atomic, instant, public. No broker. No 18-month lag.</p></div>
-    <div class="step"><div class="step-n">04</div><span class="step-tag">RETIRE</span><h3>Credits Are Burned</h3><p>At the compliance deadline, credits are submitted and burned on-chain permanently. Reuse becomes cryptographically impossible.</p></div>
+<!-- 03 BACKGROUND - for context -->
+<section id="context" class="section">
+  <p class="section-kicker">Background</p>
+  <h2 class="section-head">Why the EU carbon market needs this</h2>
+  <p class="section-body">The EU ETS is the largest carbon market on earth. Designed in the early 2000s: national registries, bilateral brokers, annual cycles. A market clearing €3B a day with no single source of truth and no audit trail anyone can read in real time.</p>
+  <div class="stats-row">
+    <div class="stat-cell">
+      <div class="stat-val">€881B</div>
+      <div class="stat-lbl">Annual trading volume</div>
+      <div class="stat-sub">EU carbon market</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">€3B</div>
+      <div class="stat-lbl">Daily spot trading</div>
+      <div class="stat-sub">per day</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">~12</div>
+      <div class="stat-lbl">Months reporting lag</div>
+      <div class="stat-sub">avg. to regulators</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">€100</div>
+      <div class="stat-lbl">Penalty per excess tonne</div>
+      <div class="stat-sub">per tCO₂e</div>
+    </div>
   </div>
+  <div class="prob-grid" style="margin-top: 48px;">
+    <div class="prob-cell">
+      <h3>9 to 18 month lag</h3>
+      <p>Emission data takes up to 18 months to reach regulators. By then the market has already moved.</p>
+    </div>
+    <div class="prob-cell">
+      <h3>27 siloed registries</h3>
+      <p>National systems and OTC bilateral deals fragment every position. No unified book exists for the whole market.</p>
+    </div>
+    <div class="prob-cell">
+      <h3>No public audit trail</h3>
+      <p>Intercompany trades are invisible to oversight until an aggregated PDF arrives. Not a live ledger.</p>
+    </div>
+  </div>
+  <p class="source-note">Source: European Commission 2025 · ICAP · Homaio</p>
 </section>
 
-<div class="rule"></div>
 
-
-<!-- ═══════════════════ SLIDE: ABOUT ═══════════════════ -->
-<section id="about" class="band-dark" style="padding: var(--pad);">
-  <p class="s-label">// About</p>
-  <h2 class="s-head">We are Sea-Twelve.</h2>
-  <p class="s-body">We build infrastructure for markets that matter. CARBON is our answer to a structural flaw embedded in the EU climate system for two decades — that no one has fixed because fixing it requires replacing the entire stack. So we did.</p>
-  <div class="about-grid">
-    <div class="about-c"><span>🏗️</span><h3>Infrastructure-First</h3><p>We don't build compliance tools on broken infrastructure. We replace the infrastructure itself — starting with the exchange layer where all value flows.</p></div>
-    <div class="about-c"><span>🇪🇺</span><h3>EU-Native by Design</h3><p>Not a crypto project retrofitting compliance. An EU ETS exchange built for regulators and corporates from day one.</p></div>
-    <div class="about-c"><span>🔬</span><h3>Research-Grounded</h3><p>Every claim sourced: European Commission 2025, ICAP, Homaio. The problem is documented, quantified, and urgent.</p></div>
-    <div class="about-c"><span>🔗</span><h3>Open by Default</h3><p>Transparency is not a feature — it's the foundation. We're building the public ledger the EU carbon market never had.</p></div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-
-<!-- ═══════════════════ CTA ═══════════════════ -->
 <section id="cta">
-  <h2 class="cta-title">The market is <span>€881 billion.</span><br>It has never had a public ledger.<br>Until now.</h2>
-  <p class="cta-sub">// EU ETS compliant · On-chain · Fully auditable · Sea-Twelve</p>
-  <div class="cta-btns">
-    <a href="demo.html" class="btn-p" style="font-size:15px;padding:15px 36px;">View Demo →</a>
-    <a href="mailto:hello@carbon.exchange" class="btn-g" style="font-size:15px;padding:15px 36px;">Contact Us</a>
+  <h2 class="cta-h2">The market is €881 billion. It never had a public ledger.</h2>
+  <p class="cta-sub">[ On-chain · Auditable · EU ETS aligned ]</p>
+  <div class="cta-actions">
+    <a class="primary" href="#demo">Watch the demo</a>
   </div>
-  <div class="cta-foot">SOURCE: European Commission 2025 Carbon Market Report · ICAP · Homaio</div>
+  <p class="cta-src">European Commission 2025 · ICAP · Homaio</p>
 </section>
 
+</main>
 
-<!-- FOOTER -->
 <footer>
-  <div class="foot-logo"><span style="width:8px;height:8px;border-radius:3px;background:var(--green);display:inline-block;"></span>CARBON</div>
+  <div class="foot-brand">
+    <span class="logo-glass logo-glass--foot">
+      <img class="foot-logo-img" src="CarbonLOGO.svg" alt="" width="830" height="391" decoding="async">
+    </span>
+  </div>
   <ul class="foot-links">
-    <li><a href="#system">The System</a></li>
-    <li><a href="#problem">The Problem</a></li>
-    <li><a href="#solution">Solution</a></li>
-    <li><a href="#how">How It Works</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="demo.html">Demo</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#product">Build</a></li>
+    <li><a href="#context">Context</a></li>
   </ul>
-  <div class="foot-copy">© 2025 Sea-Twelve · EU ETS Compliant</div>
 </footer>
+
+<script>
+(function () {
+  var nav = document.querySelector("nav");
+  var toggle = document.getElementById("nav-toggle");
+  var menu = document.getElementById("nav-menu");
+  var links = document.querySelectorAll(".nav-links a");
+  var ids = ["hero", "demo", "product", "context", "cta"];
+
+  function setNavOpen(open) {
+    if (!nav || !toggle) return;
+    nav.classList.toggle("is-open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    toggle.textContent = open ? "Close" : "Menu";
+  }
+
+  if (toggle && nav) {
+    toggle.addEventListener("click", function () {
+      setNavOpen(!nav.classList.contains("is-open"));
+    });
+    if (menu) {
+      menu.querySelectorAll("a").forEach(function (a) {
+        a.addEventListener("click", function () {
+          setNavOpen(false);
+        });
+      });
+    }
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 720) setNavOpen(false);
+    });
+  }
+
+  function onScroll() {
+    var y = window.scrollY + 100;
+    var current = "hero";
+    for (var i = ids.length - 1; i >= 0; i--) {
+      var el = document.getElementById(ids[i]);
+      if (el && el.offsetTop <= y) {
+        current = ids[i];
+        break;
+      }
+    }
+    links.forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (href && href.charAt(0) === "#") {
+        a.classList.toggle("active", href === "#" + current);
+      }
+    });
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+
+// ——— LIVE CLOCK ———
+(function () {
+  var clk = document.getElementById("nav-clock");
+  if (!clk) return;
+  function tick() {
+    var d = new Date();
+    var h = String(d.getHours()).padStart(2, "0");
+    var m = String(d.getMinutes()).padStart(2, "0");
+    var s = String(d.getSeconds()).padStart(2, "0");
+    clk.textContent = h + ":" + m + ":" + s;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+
+// ——— SCROLL REVEAL ———
+(function () {
+  if (!("IntersectionObserver" in window)) return;
+  var sel = ".stat-cell,.step-cell,.prob-cell,.about-cell,.feat-item,.story-media,.chain-block,.pen-cell,.connect-box";
+  var els = document.querySelectorAll(sel);
+  // Stagger siblings within grid rows
+  ["stat-cell", "step-cell", "about-cell", "prob-cell"].forEach(function (cls) {
+    document.querySelectorAll("." + cls).forEach(function (el, i) {
+      el.style.transitionDelay = (i * 0.07) + "s";
+    });
+  });
+  els.forEach(function (el) { el.classList.add("reveal"); });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: "0px 0px -32px 0px" });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
+<script type="module" src="carbon-lattice.js"></script>
 
 </body>
 </html>
